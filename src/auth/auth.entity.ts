@@ -7,4 +7,16 @@ export class AuthEntity {
 
     @Column()
     name: string;
+
+    @Column()
+    email: string;
+
+    @Column()
+    protPass: string;
+
+    @Column()
+    utcPass: string;
+
+    @Column()
+    passUsed: boolean;
 } 

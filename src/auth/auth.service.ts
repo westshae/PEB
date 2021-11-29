@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthEntity } from './auth.entity';
 import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
+import * as bcrypt from 'bcrypt';
 import "dotenv/config"
 
 @Injectable()
@@ -10,7 +11,6 @@ export class AuthService {
     @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
     async getAll(): Promise<AuthEntity[]> {
-      
         return await this.authRepo.find();
     }
 
@@ -28,9 +28,11 @@ export class AuthService {
       var mailOptions = {
         from: process.env.EMAILSENDER,
         to: process.env.TESTEMAIL,
-        subject: 'Tester emails',
-        text: 'WOOHOO'
+        subject: 'AUTHENTICATION',
+        text: ''
       };
+
+      mailOptions.text = "654654";
       
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
