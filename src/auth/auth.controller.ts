@@ -8,8 +8,7 @@ export class AuthController {
 
   @Get()
   auth(){
-    // this.authService.sendEmail();
-    this.authService.auth();
+    this.authService.sendCode();
   }
 
 }

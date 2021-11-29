@@ -10,15 +10,21 @@ import "dotenv/config"
 export class AuthService {
   @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
-  async auth(){
-    let code = this.generateCode().toString();
+  async sendCode(){
+    let code = (Math.floor(Math.random()* 90000000) + 10000000).toString();
     // this.sendEmail(code);
     let saltHashed = await this.crypt(code);
+    let utc = Date.now();
 
+    //TODO
+    //Save time, saltHashed to database
   }
 
-  generateCode(){
-    return Math.floor(Math.random()* 90000000) + 10000000;
+  async checkCode(code: string, hash: string){
+    //TODO
+    //Check database values to see if has been used, or fits time period;
+    //Change database values
+    return await bcrypt.compare(code, hash);
   }
 
   async crypt(code: string){
