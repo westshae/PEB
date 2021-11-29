@@ -11,35 +11,24 @@ export class AuthService {
   @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
   async accountCheck(email:string){
-    
-    let res = await this.authRepo.findOne({ email: email});
-    if(res === undefined){
-      this.accountCreate(email);
-    }else{
-      this.sendCode(email);
-    }
-
+    this.sendCode(email);
     //TODO
-    //Check database for email.
-    //if exists, send password.
-    //else, create account;
-  }
-
-  accountCreate(email:string){
-    //TODO
-    //this.sendCode();
-    //Save email, login data to database
+    //Sanatise
   }
 
   async sendCode(email:string){
     let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
     this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
-    let utc = Date.now();
+    let utc = new Date((Date.now() + 300000)).toISOString();//Current time + 5 minutes
 
-    //TODO
-    //Save time, saltHashed to database
+    if(this.authRepo.findOne({email: email}) !== undefined) {
+      this.authRepo.insert({email: email, protPass: saltHashed, utcPass: utc, passUsed: false})
+    }else{
+      this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false});
+    }
   }
+
 
   async checkCode(code: string, hash: string){
     //TODO
