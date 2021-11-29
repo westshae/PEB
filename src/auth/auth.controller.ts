@@ -5,10 +5,11 @@ import { AuthEntity } from "./auth.entity";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+
   @Get()
-  async getAll(): Promise<AuthEntity[]> {
-    this.authService.sendEmail();
-    return await this.authService.getAll();
+  auth(){
+    // this.authService.sendEmail();
+    this.authService.auth();
   }
 
 }

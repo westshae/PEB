@@ -8,15 +8,24 @@ import "dotenv/config"
 
 @Injectable()
 export class AuthService {
-    @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
+  @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
-    async getAll(): Promise<AuthEntity[]> {
-        return await this.authRepo.find();
-    }
+  async auth(){
+    let code = this.generateCode().toString();
+    // this.sendEmail(code);
+    let saltHashed = await this.crypt(code);
 
+  }
 
-  async sendEmail() {
-    console.log("REE")
+  generateCode(){
+    return Math.floor(Math.random()* 90000000) + 10000000;
+  }
+
+  async crypt(code: string){
+    return await bcrypt.hash(code, 10);
+  }
+
+  sendEmail(code: string) {
       var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -29,10 +38,8 @@ export class AuthService {
         from: process.env.EMAILSENDER,
         to: process.env.TESTEMAIL,
         subject: 'AUTHENTICATION',
-        text: ''
+        text: code
       };
-
-      mailOptions.text = "654654";
       
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
