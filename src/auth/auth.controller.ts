@@ -8,9 +8,7 @@ export class AuthController {
 
   @Get()
   auth(){
-    this.authService.accountCheck("shaewest02@gmail.com");
-    this.authService.accountCheck("empty@empty.com");
-
+    this.authService.sendCode("shaewest02@gmail.com");
+    this.authService.sendCode("empty@empty.com");
   }
-
 }

@@ -10,13 +10,11 @@ import "dotenv/config"
 export class AuthService {
   @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
-  async accountCheck(email:string){
-    this.sendCode(email);
-    //TODO
-    //Sanatise
-  }
 
   async sendCode(email:string){
+    //TODO
+    //SANITISE EMAIL
+
     let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
     this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
@@ -30,7 +28,7 @@ export class AuthService {
   }
 
 
-  async checkCode(code: string, hash: string){
+  async checkCode(email:string, code: string, hash: string){
     //TODO
     //Check database values to see if has been used, or fits time period;
     //Change database values
