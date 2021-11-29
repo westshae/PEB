@@ -10,8 +10,21 @@ import "dotenv/config"
 export class AuthService {
   @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
+  accountCheck(email:string){
+    //TODO
+    //Check database for email.
+    //if exists, send password.
+    //else, create account;
+  }
+
+  accountCreate(email:string){
+    //TODO
+    //this.sendCode();
+    //Save email, login data to database
+  }
+
   async sendCode(){
-    let code = (Math.floor(Math.random()* 90000000) + 10000000).toString();
+    let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
     // this.sendEmail(code);
     let saltHashed = await bcrypt.hash(code, 10);
     let utc = Date.now();
