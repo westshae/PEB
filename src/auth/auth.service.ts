@@ -13,7 +13,7 @@ export class AuthService {
   async sendCode(){
     let code = (Math.floor(Math.random()* 90000000) + 10000000).toString();
     // this.sendEmail(code);
-    let saltHashed = await this.crypt(code);
+    let saltHashed = await bcrypt.hash(code, 10);
     let utc = Date.now();
 
     //TODO
@@ -25,10 +25,6 @@ export class AuthService {
     //Check database values to see if has been used, or fits time period;
     //Change database values
     return await bcrypt.compare(code, hash);
-  }
-
-  async crypt(code: string){
-    return await bcrypt.hash(code, 10);
   }
 
   sendEmail(code: string) {
