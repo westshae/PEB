@@ -10,7 +10,15 @@ import "dotenv/config"
 export class AuthService {
   @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
 
-  accountCheck(email:string){
+  async accountCheck(email:string){
+    
+    let res = await this.authRepo.findOne({ email: email});
+    if(res === undefined){
+      this.accountCreate(email);
+    }else{
+      this.sendCode(email);
+    }
+
     //TODO
     //Check database for email.
     //if exists, send password.
@@ -23,9 +31,9 @@ export class AuthService {
     //Save email, login data to database
   }
 
-  async sendCode(){
+  async sendCode(email:string){
     let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
-    // this.sendEmail(code);
+    this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
     let utc = Date.now();
 
@@ -40,7 +48,7 @@ export class AuthService {
     return await bcrypt.compare(code, hash);
   }
 
-  sendEmail(code: string) {
+  sendEmail(code: string, email: string) {
       var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -51,7 +59,7 @@ export class AuthService {
       
       var mailOptions = {
         from: process.env.EMAILSENDER,
-        to: process.env.TESTEMAIL,
+        to: email,
         subject: 'AUTHENTICATION',
         text: code
       };
