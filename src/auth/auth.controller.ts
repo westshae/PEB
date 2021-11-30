@@ -8,11 +8,10 @@ export class AuthController {
   @Get("get")
   get(){
     this.authService.sendCode("shaewest02@gmail.com");
-    // this.authService.sendCode("empty@empty.com");
   }
   @Get("check")
   async check(@Query() query){
-    console.log(query);
-    console.log(await this.authService.checkCode("shaewest02@gmail.com",query.query.toString()));
+    let email = query.email.toString();
+    console.log(await this.authService.checkCode("shaewest02@gmail.com",email));
   }
 }
