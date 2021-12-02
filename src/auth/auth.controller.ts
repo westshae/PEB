@@ -7,12 +7,23 @@ export class AuthController {
 
   @Get("get")
   get(@Query() query){
-    let email = query.email.toString();
-    this.authService.sendCode(email);
+    try{
+      let email = query.email;
+      if(typeof email !== "string") return;
+      this.authService.sendCode(email);
+    }catch(e){
+      console.error(e);
+    }
   }
   @Get("check")
   async check(@Query() query){
-    let email = query.email.toString();
-    console.log(await this.authService.checkCode("shaewest02@gmail.com",email));
+    try{
+      let email = query.email;
+      let code = query.code;
+      if(typeof email !== "string" || typeof code !== "string") return;
+      console.log(await this.authService.checkCode(email,code));
+    }catch(e){
+      console.error(e);
+    }
   }
 }
