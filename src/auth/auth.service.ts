@@ -30,11 +30,21 @@ export class AuthService {
 
 
   async checkCode(email:string, code: string){
+    let codeRegex = /^[0-9]{8}$/
+    let emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    if(!email.match(emailRegex) || !code.match(codeRegex)) return false;
+    console.log(email);
     //TODO
     //Check database values to see if has been used, or fits time period;
     //Change database values
-    let given = (await this.authRepo.findOne({email: email})).protPass;
-    return await bcrypt.compare(code, given);
+    try{
+      let given = await this.authRepo.findOne({email: email});
+      if(given === undefined) return false;
+      return await bcrypt.compare(code, given.protPass);
+    }catch(e){
+      console.error(e);
+      return false;
+    }
   }
 
   sendEmail(code: string, email: string) {
