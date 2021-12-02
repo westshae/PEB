@@ -6,8 +6,9 @@ export class AuthController {
 
 
   @Get("get")
-  get(){
-    this.authService.sendCode("shaewest02@gmail.com");
+  get(@Query() query){
+    let email = query.email.toString();
+    this.authService.sendCode(email);
   }
   @Get("check")
   async check(@Query() query){
