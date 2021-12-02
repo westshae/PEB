@@ -35,9 +35,7 @@ export class AuthService {
 
     if(email.match(emailRegex) === null) return false;
     if(code.match(codeRegex) === null) return false;
-    //TODO
-    //Check database values to see if has been used, or fits time period;
-    //Change database values
+
     try{
       //Checks if email exists in database
       let account = await this.authRepo.findOne({email: email});
@@ -49,19 +47,14 @@ export class AuthService {
       let date = new Date(account.utcPass);
       let currentDate = Date.now();
       let timeDifference = 300000;// 5 minutes in milliseconds
-      if(date.getMilliseconds() + timeDifference < currentDate) return false;
+      if(date.getMilliseconds() + timeDifference > currentDate) return false;
       
       let success = await bcrypt.compare(code, account.protPass);//Returns if password was successful or not.
 
       if(success){
-        console.log(account)
         account.passUsed = true;
         this.authRepo.update({email:email}, account);
-        console.log(await this.authRepo.findOne({email:email}));
-        console.log("REEE")
       }
-
-      //Change values of database after successful comparison
 
       return success;
     }catch(e){
