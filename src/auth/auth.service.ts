@@ -4,6 +4,7 @@ import { AuthEntity } from './auth.entity';
 import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import * as bcrypt from 'bcrypt';
+import * as jwt from "jsonwebtoken"
 import "dotenv/config"
 
 @Injectable()
@@ -20,9 +21,16 @@ export class AuthService {
     this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
     let utc = new Date((Date.now() + 300000)).toISOString();//Current time + 5 minutes
+    let id:number = (Math.floor(Math.random()* 90000000) + 10000000);
+    while(true){
+      if(await this.authRepo.findOne(id) == null){
+        break;
+      }
+      id = (Math.floor(Math.random()* 90000000) + 10000000);
+    }
 
     if(await this.authRepo.findOne({email: email}) === undefined) {
-      this.authRepo.insert({email: email, protPass: saltHashed, utcPass: utc, passUsed: false})
+      this.authRepo.insert({email: email, protPass: saltHashed, utcPass: utc, passUsed: false, id:id})
     }else{
       this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false});
     }
@@ -56,7 +64,11 @@ export class AuthService {
         this.authRepo.update({email:email}, account);
       }
 
-      return success;
+      let payload = {email:account.email, id:account.id}
+
+      return {
+        access_token: jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"})
+      };
     }catch(e){
       console.error(e);
       return false;

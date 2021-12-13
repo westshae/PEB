@@ -20,6 +20,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^8.0.2",
     "bcrypt": "^5.0.1",
+    "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.7.1",
     "pg": "^8.7.1",
     "reflect-metadata": "^0.1.13",

@@ -6,6 +6,9 @@ export class AuthEntity {
     email: string;
 
     @Column()
+    id: number;
+
+    @Column()
     protPass: string;
 
     @Column()
