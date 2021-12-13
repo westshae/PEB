@@ -16,4 +16,7 @@ export class AuthEntity {
 
     @Column()
     passUsed: boolean;
+    
+    @Column({nullable:true})
+    accessToken: string;
 } 

@@ -32,7 +32,7 @@ export class AuthService {
     if(await this.authRepo.findOne({email: email}) === undefined) {
       this.authRepo.insert({email: email, protPass: saltHashed, utcPass: utc, passUsed: false, id:id})
     }else{
-      this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false});
+      this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false, id:id});
     }
   }
 
@@ -59,15 +59,19 @@ export class AuthService {
       
       let success = await bcrypt.compare(code, account.protPass);//Returns if password was successful or not.
 
+      let payload = {email:account.email, id:account.id}
+      let access_token = jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"});
+      account.accessToken = access_token;
+
       if(success){
         account.passUsed = true;
         this.authRepo.update({email:email}, account);
       }
 
-      let payload = {email:account.email, id:account.id}
+      
 
       return {
-        access_token: jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"})
+        access_token: access_token
       };
     }catch(e){
       console.error(e);
