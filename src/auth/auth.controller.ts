@@ -15,13 +15,24 @@ export class AuthController {
       console.error(e);
     }
   }
-  @Get("check")
-  async check(@Query() query){
+  @Get("checkcode")
+  async checkCode(@Query() query){
     try{
       let email = query.email;
       let code = query.code;
       if(typeof email !== "string" || typeof code !== "string") return;
-      console.log(await this.authService.checkCode(email,code));
+      return await this.authService.checkCode(email,code);
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+  @Get("checktoken")
+  async checkToken(@Query() query){
+    try{
+      let token = query.token;
+      if(typeof token !== "string") return;
+      return await this.authService.checkToken(token);
     }catch(e){
       console.error(e);
     }

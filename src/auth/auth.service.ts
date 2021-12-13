@@ -61,7 +61,6 @@ export class AuthService {
 
       let payload = {email:account.email, id:account.id}
       let access_token = jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"});
-      account.accessToken = access_token;
 
       if(success){
         account.passUsed = true;
@@ -73,6 +72,20 @@ export class AuthService {
       return {
         access_token: access_token
       };
+    }catch(e){
+      console.error(e);
+      return false;
+    }
+  }
+
+  async checkToken(token: string){
+    try{
+      const decoded = jwt.verify(token, process.env.PRIVATEKEY);
+      if(decoded === null){
+        return false;
+      }else{
+        return true;
+      }
     }catch(e){
       console.error(e);
       return false;
