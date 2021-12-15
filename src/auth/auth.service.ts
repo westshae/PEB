@@ -70,8 +70,9 @@ export class AuthService {
       
 
       return {
-        access_token: access_token
-      };
+        access_token: access_token,
+        id: account.id
+      }
     }catch(e){
       console.error(e);
       return false;
