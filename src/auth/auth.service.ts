@@ -15,25 +15,28 @@ export class AuthService {
   async sendCode(email:string){
     //TODO
     //SANITISE EMAIL
-
+    if(await this.authRepo.findOne({email:email}) === undefined){
+      this.registerAccount(email);
+    }
 
     let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
     this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
     let utc = new Date((Date.now() + 300000)).toISOString();//Current time + 5 minutes
-    let id:number = (Math.floor(Math.random()* 90000000) + 10000000);
-    while(true){
-      if(await this.authRepo.findOne(id) == null){
-        break;
-      }
-      id = (Math.floor(Math.random()* 90000000) + 10000000);
-    }
+    
+    this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false});
+  }
+  
+  async registerAccount(email:string){
 
-    if(await this.authRepo.findOne({email: email}) === undefined) {
-      this.authRepo.insert({email: email, protPass: saltHashed, utcPass: utc, passUsed: false, id:id})
-    }else{
-      this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false, id:id});
-    }
+    //TODO
+    //SANITISE STUFF
+    this.authRepo.insert({
+      email: email, 
+      balance:0,
+      ratings:0,
+      ratingTotal:0      
+    })
   }
 
 
@@ -59,7 +62,7 @@ export class AuthService {
       
       let success = await bcrypt.compare(code, account.protPass);//Returns if password was successful or not.
 
-      let payload = {email:account.email, id:account.id}
+      let payload = {email:account.email}
       let access_token = jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"});
 
       if(success){
@@ -70,8 +73,7 @@ export class AuthService {
       
 
       return {
-        access_token: access_token,
-        id: account.id
+        access_token: access_token
       }
     }catch(e){
       console.error(e);
