@@ -39,14 +39,12 @@ export class AuthService {
   }
 
   async getSettings(email:string, token:string){
-    if(!this.checkToken(token)) return;
     let data = await this.authRepo.findOne({email:email});
     let settings = {
       city:data.city,
       country:data.country,
       balance:data.balance
     }
-
     return settings;
   }
 

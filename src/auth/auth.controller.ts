@@ -31,7 +31,11 @@ export class AuthController {
   async settings(@Query() query){
     let email = query.email;
     let token = query.code;
+
+    let settings = await this.authService.getSettings(email, token);
+
+    console.log(settings);
     
-    return this.authService.getSettings(email, token);
+    return settings;
   }
 }
