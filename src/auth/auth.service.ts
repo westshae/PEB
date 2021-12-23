@@ -28,7 +28,6 @@ export class AuthService {
   }
   
   async registerAccount(email:string){
-
     //TODO
     //SANITISE STUFF
     this.authRepo.insert({
@@ -37,6 +36,24 @@ export class AuthService {
       ratings:0,
       ratingTotal:0      
     })
+  }
+
+  async getSettings(email:string, token:string){
+    if(!this.checkToken(token)) return;
+    let data = await this.authRepo.findOne({email:email});
+    let settings = {
+      city:data.city,
+      country:data.country,
+      balance:data.balance
+    }
+
+    return settings;
+  }
+
+  async updateSettings(email:string, token:string, settings:Array<any>){
+    if(this.checkToken(token)){
+      
+    }
   }
 
 

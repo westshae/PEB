@@ -27,14 +27,11 @@ export class AuthController {
     }
   }
 
-  @Get("checktoken")
-  async checkToken(@Query() query){
-    try{
-      let token = query.token;
-      if(typeof token !== "string") return;
-      return await this.authService.checkToken(token);
-    }catch(e){
-      console.error(e);
-    }
+  @Get("settings")
+  async settings(@Query() query){
+    let email = query.email;
+    let token = query.code;
+    
+    return this.authService.getSettings(email, token);
   }
 }
