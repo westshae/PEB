@@ -43,7 +43,8 @@ export class AuthService {
     let settings = {
       city:data.city,
       country:data.country,
-      balance:data.balance
+      balance:data.balance,
+      profession:data.profession
     }
     return settings;
   }

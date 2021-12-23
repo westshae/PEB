@@ -33,8 +33,6 @@ export class AuthController {
     let token = query.code;
 
     let settings = await this.authService.getSettings(email, token);
-
-    console.log(settings);
     
     return settings;
   }
