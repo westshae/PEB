@@ -39,6 +39,8 @@ export class AuthService {
   }
 
   async getSettings(email:string, token:string){
+    if(!this.checkToken(token)) return;
+    console.log(token);
     let data = await this.authRepo.findOne({email:email});
     let settings = {
       city:data.city,
@@ -50,9 +52,7 @@ export class AuthService {
   }
 
   async updateSettings(email:string, token:string, settings:Array<any>){
-    if(this.checkToken(token)){
-      
-    }
+    if(!this.checkToken(token)) return;
   }
 
 
@@ -79,7 +79,7 @@ export class AuthService {
       let success = await bcrypt.compare(code, account.protPass);//Returns if password was successful or not.
 
       let payload = {email:account.email}
-      let access_token = jwt.sign(payload, process.env.PRIVATEKEY, { expiresIn:"2h"});
+      let access_token = jwt.sign(payload, process.env.PRIVATEKEY);
 
       if(success){
         account.passUsed = true;
@@ -99,6 +99,7 @@ export class AuthService {
 
   async checkToken(token: string){
     try{
+      console.log(token);
       const decoded = jwt.verify(token, process.env.PRIVATEKEY);
       if(decoded === null){
         return false;

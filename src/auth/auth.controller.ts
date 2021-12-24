@@ -30,7 +30,7 @@ export class AuthController {
   @Get("settings")
   async settings(@Query() query){
     let email = query.email;
-    let token = query.code;
+    let token = query.token;
 
     let settings = await this.authService.getSettings(email, token);
     
