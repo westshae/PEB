@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   async getSettings(email:string, token:string){
-    if(!this.checkToken(token)) return;
+    if(!this.checkToken(email, token)) return;
     console.log(token);
     let data = await this.authRepo.findOne({email:email});
     let settings = {
@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   async updateSettings(email:string, token:string, settings:Array<any>){
-    if(!this.checkToken(token)) return;
+    if(!this.checkToken(email, token)) return;
   }
 
 
@@ -97,13 +97,16 @@ export class AuthService {
     }
   }
 
-  async checkToken(token: string){
+  async checkToken(email:string, token: string){
     try{
-      console.log(token);
       const decoded = jwt.verify(token, process.env.PRIVATEKEY);
       if(decoded === null){
         return false;
       }else{
+        console.log(decoded);
+        if(decoded.email != email){
+          return false
+        }
         return true;
       }
     }catch(e){
