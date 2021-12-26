@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 @Controller("auth")
 export class AuthController {
@@ -27,13 +27,29 @@ export class AuthController {
     }
   }
 
-  @Get("settings")
+  @Get("settings/get/")
   async settings(@Query() query){
     let email = query.email;
     let token = query.token;
 
+    console.log(email)
+    console.log(token);
+
     let settings = await this.authService.getSettings(email, token);
     
     return settings;
+  }
+
+  @Post("settings/update/")
+  async settingsUpdate(@Body() body){
+    let email = body.email;
+    let token = body.token;
+
+    let settings = body.settings;
+
+    console.log(email);
+    console.log(token);
+    console.log(settings);
+
   }
 }
