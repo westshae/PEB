@@ -1,144 +1,179 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthEntity } from './auth.entity';
-import { Repository } from 'typeorm';
-import * as nodemailer from 'nodemailer';
-import * as bcrypt from 'bcrypt';
-import * as jwt from "jsonwebtoken"
-import "dotenv/config"
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { AuthEntity } from "./auth.entity";
+import { Repository } from "typeorm";
+import * as nodemailer from "nodemailer";
+import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import "dotenv/config";
 
 @Injectable()
 export class AuthService {
-  @InjectRepository(AuthEntity) private readonly authRepo: Repository<AuthEntity>;
+  @InjectRepository(AuthEntity)
+  private readonly authRepo: Repository<AuthEntity>;
 
-
-  async sendCode(email:string){
+  async sendCode(email: string) {
     //TODO
     //SANITISE EMAIL
-    if(await this.authRepo.findOne({email:email}) === undefined){
+    if ((await this.authRepo.findOne({ email: email })) === undefined) {
       this.registerAccount(email);
     }
 
-    let code = (Math.floor(Math.random()* 90000000) + 10000000).toString(); // Generates 8 digit number
+    let code = (Math.floor(Math.random() * 90000000) + 10000000).toString(); // Generates 8 digit number
     this.sendEmail(code, email);
     let saltHashed = await bcrypt.hash(code, 10);
-    let utc = new Date((Date.now() + 300000)).toISOString();//Current time + 5 minutes
-    
-    this.authRepo.update(email, {email:email, protPass: saltHashed, utcPass:utc, passUsed:false});
+    let utc = new Date(Date.now() + 300000).toISOString(); //Current time + 5 minutes
+
+    this.authRepo.update(email, {
+      email: email,
+      protPass: saltHashed,
+      utcPass: utc,
+      passUsed: false,
+    });
   }
-  
-  async registerAccount(email:string){
+
+  async registerAccount(email: string) {
     //TODO
     //SANITISE STUFF
     this.authRepo.insert({
-      email: email, 
-      balance:0,
-      ratings:0,
-      ratingTotal:0      
-    })
+      email: email,
+      balance: 0,
+      ratings: 0,
+      ratingTotal: 0,
+    });
   }
 
-  async getSettings(email:string, token:string){
-    if(!this.checkToken(email, token)) return;
+  async getSettings(email: string, token: string) {
+    if (!this.checkToken(email, token)) return;
     console.log(token);
-    let data = await this.authRepo.findOne({email:email});
+    let data = await this.authRepo.findOne({ email: email });
     let settings = {
-      city:data.city,
-      country:data.country,
-      balance:data.balance,
-      profession:data.profession
-    }
+      city: data.city,
+      country: data.country,
+      balance: data.balance,
+      profession: data.profession,
+    };
     return settings;
   }
 
-  async updateSettings(email:string, token:string, settings:Array<any>){
-    if(!this.checkToken(email, token)) return;
+  async updateSettings(email: string, token: string, settings: Array<any>) {
+    if (!this.checkToken(email, token)) return;
+
+    for (let key in settings) {
+      console.log(key);
+      switch (parseInt(key)) {
+        case 0: //City
+          this.authRepo.update({ email: email }, { city: settings[key] });
+          break;
+        case 1: //Country
+          this.authRepo.update({ email: email }, { country: settings[key] });
+          break;
+
+        case 2: //Balance
+          this.authRepo.update({ email: email }, { balance: settings[key] });
+          break;
+
+        case 3: //Profession
+          this.authRepo.update({ email: email }, { profession: settings[key] });
+          break;
+      }
+    }
+
+    // let data = await this.authRepo.findOne({email:email});
+
+    // for(let [key, value] of settings.entries()){
+
+    //   // console.log(settings[key]);
+    //   console.log(value);
+    //   // this.authRepo.save({email:email})
+
+    // }
+    // for(let current of settings.keys()){
+    //   console.log(current);
+    // }
+    // console.log(settings.entries());
   }
 
+  async checkCode(email: string, code: string) {
+    let codeRegex = /^\b\d{8}\b$/;
+    let emailRegex =
+      /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/;
 
-  async checkCode(email:string, code: string){
-    let codeRegex = /^\b\d{8}\b$/
-    let emailRegex = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
+    if (email.match(emailRegex) === null) return false;
+    if (code.match(codeRegex) === null) return false;
 
-    if(email.match(emailRegex) === null) return false;
-    if(code.match(codeRegex) === null) return false;
-
-    try{
+    try {
       //Checks if email exists in database
-      let account = await this.authRepo.findOne({email: email});
-      if(account === undefined) return false;
+      let account = await this.authRepo.findOne({ email: email });
+      if (account === undefined) return false;
 
-      if(account.passUsed) return false;//Checks that current code hasn't been used
+      if (account.passUsed) return false; //Checks that current code hasn't been used
 
       //Checks that code was used within time required since creation.
       let date = new Date(account.utcPass);
       let currentDate = Date.now();
-      let timeDifference = 300000;// 5 minutes in milliseconds
-      if(date.getMilliseconds() + timeDifference > currentDate) return false;
-      
-      let success = await bcrypt.compare(code, account.protPass);//Returns if password was successful or not.
+      let timeDifference = 300000; // 5 minutes in milliseconds
+      if (date.getMilliseconds() + timeDifference > currentDate) return false;
 
-      let payload = {email:account.email}
+      let success = await bcrypt.compare(code, account.protPass); //Returns if password was successful or not.
+
+      let payload = { email: account.email };
       let access_token = jwt.sign(payload, process.env.PRIVATEKEY);
 
-      if(success){
+      if (success) {
         account.passUsed = true;
-        this.authRepo.update({email:email}, account);
+        this.authRepo.update({ email: email }, account);
       }
-
-      
 
       return {
-        access_token: access_token
-      }
-    }catch(e){
+        access_token: access_token,
+      };
+    } catch (e) {
       console.error(e);
       return false;
     }
   }
 
-  async checkToken(email:string, token: string){
-    try{
+  async checkToken(email: string, token: string) {
+    try {
       const decoded = jwt.verify(token, process.env.PRIVATEKEY);
-      if(decoded === null){
+      if (decoded === null) {
         return false;
-      }else{
+      } else {
         console.log(decoded);
-        if(decoded.email != email){
-          return false
+        if (decoded.email != email) {
+          return false;
         }
         return true;
       }
-    }catch(e){
+    } catch (e) {
       console.error(e);
       return false;
     }
   }
 
   sendEmail(code: string, email: string) {
-      var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAILSENDER,
-          pass: process.env.EMAILPASSWORD
-        }
-      });
-      
-      var mailOptions = {
-        from: process.env.EMAILSENDER,
-        to: email,
-        subject: 'AUTHENTICATION',
-        text: code
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      }); 
-    
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAILSENDER,
+        pass: process.env.EMAILPASSWORD,
+      },
+    });
+
+    var mailOptions = {
+      from: process.env.EMAILSENDER,
+      to: email,
+      subject: "AUTHENTICATION",
+      text: code,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
   }
-    
 }

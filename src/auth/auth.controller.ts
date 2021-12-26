@@ -50,6 +50,7 @@ export class AuthController {
     console.log(email);
     console.log(token);
     console.log(settings);
+    this.authService.updateSettings(email, token, settings);
 
   }
 }
