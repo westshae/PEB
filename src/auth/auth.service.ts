@@ -6,6 +6,7 @@ import * as nodemailer from "nodemailer";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import "dotenv/config";
+import axios from "axios";
 
 @Injectable()
 export class AuthService {
@@ -78,20 +79,6 @@ export class AuthService {
           break;
       }
     }
-
-    // let data = await this.authRepo.findOne({email:email});
-
-    // for(let [key, value] of settings.entries()){
-
-    //   // console.log(settings[key]);
-    //   console.log(value);
-    //   // this.authRepo.save({email:email})
-
-    // }
-    // for(let current of settings.keys()){
-    //   console.log(current);
-    // }
-    // console.log(settings.entries());
   }
 
   async checkCode(email: string, code: string) {
@@ -140,7 +127,6 @@ export class AuthService {
       if (decoded === null) {
         return false;
       } else {
-        console.log(decoded);
         if (decoded.email != email) {
           return false;
         }

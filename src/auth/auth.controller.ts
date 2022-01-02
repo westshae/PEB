@@ -32,9 +32,6 @@ export class AuthController {
     let email = query.email;
     let token = query.token;
 
-    console.log(email)
-    console.log(token);
-
     let settings = await this.authService.getSettings(email, token);
     
     return settings;
@@ -46,11 +43,9 @@ export class AuthController {
     let token = body.token;
 
     let settings = body.settings;
-
-    console.log(email);
-    console.log(token);
-    console.log(settings);
     this.authService.updateSettings(email, token, settings);
 
   }
+
+  
 }
