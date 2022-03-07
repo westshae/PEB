@@ -23,7 +23,6 @@ export class PostsService {
 
   async getPost(postID: string) {
     let data = await this.postsRepo.findOne({ id: postID });
-    console.log(data);
     return data;
   }
 
@@ -37,6 +36,13 @@ export class PostsService {
       comments: null
     }
     this.postsRepo.save(post);
+  }
+
+  async deletePost(email:string, postID:string){
+    let post = await (this.getPost(postID));
+    if(post.ownerEmail === email){
+      this.postsRepo.delete({id:postID});
+    }else return;
   }
 
   async addComment(postID:string, content:string){
