@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { checkEmail, checkToken } from "src/utility/sanitise";
 import { AuthService } from "./auth.service";
 @Controller("auth")
 export class AuthController {
@@ -9,7 +10,7 @@ export class AuthController {
   get(@Query() query){
     try{
       let email = query.email;
-      if(typeof email !== "string") return;
+      if(!checkEmail(email)) return false;
       this.authService.sendCode(email);
     }catch(e){
       console.error(e);
@@ -20,7 +21,7 @@ export class AuthController {
     try{
       let email = query.email;
       let code = query.code;
-      if(typeof email !== "string" || typeof code !== "string") return;
+      if(!checkEmail(email) || !this.checkCode(code)) return false;
       return await this.authService.checkCode(email,code);
     }catch(e){
       console.error(e);
@@ -32,6 +33,8 @@ export class AuthController {
     let email = query.email;
     let token = query.token;
 
+    if(!checkEmail(email) || !checkToken(email,token)) return false;
+
     let settings = await this.authService.getSettings(email, token);
     
     return settings;
@@ -42,9 +45,9 @@ export class AuthController {
     let email = body.email;
     let token = body.token;
 
+    if(!checkEmail(email) || !checkToken(email, token)) return false;
+
     let settings = body.settings;
     this.authService.updateSettings(email, token, settings);
-  }
-
-  
+  }  
 }

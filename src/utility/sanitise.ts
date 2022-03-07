@@ -1,3 +1,4 @@
+import * as jwt from "jsonwebtoken";
 
 
 const checkEmail = (email:string) =>{
@@ -20,4 +21,22 @@ const checkStringContent = (content:string) =>{
   return true;
 }
 
-export {checkEmail, checkPostID, checkStringContent}
+const checkToken = (email:string, token:string) =>{
+  if(!checkEmail(email)) return false;
+  try {
+    const decoded = jwt.verify(token, process.env.PRIVATEKEY);
+    if(decoded === null){
+      return false;
+    }else {
+      if(decoded.email != email){
+        return false;
+      }
+      return true;
+    }
+  }catch(e){
+    console.error(e);
+    return false;
+  }
+}
+
+export {checkEmail, checkPostID, checkStringContent, checkToken}

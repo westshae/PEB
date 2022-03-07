@@ -7,6 +7,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import "dotenv/config";
 import axios from "axios";
+import { checkEmail, checkToken } from "src/utility/sanitise";
 
 @Injectable()
 export class AuthService {
@@ -14,8 +15,7 @@ export class AuthService {
   private readonly authRepo: Repository<AuthEntity>;
 
   async sendCode(email: string) {
-    //TODO
-    //SANITISE EMAIL
+    if(!checkEmail(email)) return false;
     if ((await this.authRepo.findOne({ email: email })) === undefined) {
       this.registerAccount(email);
     }
@@ -34,8 +34,7 @@ export class AuthService {
   }
 
   async registerAccount(email: string) {
-    //TODO
-    //SANITISE STUFF
+    if(!checkEmail(email)) return false;
     this.authRepo.insert({
       email: email,
       balance: 0,
@@ -45,8 +44,7 @@ export class AuthService {
   }
 
   async getSettings(email: string, token: string) {
-    if (!this.checkToken(email, token)) return;
-    console.log(token);
+    if (!checkToken(email, token)) return;
     let data = await this.authRepo.findOne({ email: email });
     let settings = {
       city: data.city,
@@ -58,8 +56,6 @@ export class AuthService {
   }
 
   async updateSettings(email: string, token: string, settings: Array<any>) {
-    if (!this.checkToken(email, token)) return;
-
     for (let key in settings) {
       console.log(key);
       switch (parseInt(key)) {
@@ -82,13 +78,6 @@ export class AuthService {
   }
 
   async checkCode(email: string, code: string) {
-    let codeRegex = /^\b\d{8}\b$/;
-    let emailRegex =
-      /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/;
-
-    if (email.match(emailRegex) === null) return false;
-    if (code.match(codeRegex) === null) return false;
-
     try {
       //Checks if email exists in database
       let account = await this.authRepo.findOne({ email: email });
@@ -121,22 +110,6 @@ export class AuthService {
     }
   }
 
-  async checkToken(email: string, token: string) {
-    try {
-      const decoded = jwt.verify(token, process.env.PRIVATEKEY);
-      if (decoded === null) {
-        return false;
-      } else {
-        if (decoded.email != email) {
-          return false;
-        }
-        return true;
-      }
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  }
 
   sendEmail(code: string, email: string) {
     var transporter = nodemailer.createTransport({
