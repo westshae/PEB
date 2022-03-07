@@ -6,7 +6,7 @@ export class PostsEntity {
     ownerEmail: string;
 
     @Column()
-    id: string;
+    postID: string;
 
     @Column()
     content: string;

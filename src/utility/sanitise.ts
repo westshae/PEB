@@ -24,11 +24,14 @@ const checkStringContent = (content:string) =>{
 const checkToken = (email:string, token:string) =>{
   if(!checkEmail(email)) return false;
   try {
+    console.log(token);
     const decoded = jwt.verify(token, process.env.PRIVATEKEY);
+    console.log(decoded)
     if(decoded === null){
       return false;
     }else {
       if(decoded.email != email){
+        console.log(decoded.email);
         return false;
       }
       return true;

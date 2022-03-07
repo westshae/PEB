@@ -1,5 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
-import { checkEmail, checkPostID, checkStringContent } from "src/utility/sanitise";
+import {
+  checkEmail,
+  checkPostID,
+  checkStringContent,
+  checkToken,
+} from "src/utility/sanitise";
 import { PostsService } from "./posts.service";
 @Controller("posts")
 export class PostsController {
@@ -9,8 +14,10 @@ export class PostsController {
   async getPost(@Query() query) {
     try {
       let postID = query.postID;
-      if(!checkPostID(postID)) return false;
-      return await this.postsService.getPost(postID);
+      if (!checkPostID(postID)) return false;
+      let test = await this.postsService.getPost(postID);
+      console.log(test);
+      return test
     } catch (e) {
       console.error(e);
     }
@@ -21,7 +28,13 @@ export class PostsController {
     try {
       let content = query.content;
       let email = query.email;
-      if(!checkEmail(email) || !checkStringContent(content)) return false;
+      let token = query.token;
+      if (
+        !checkEmail(email) ||
+        !checkStringContent(content) ||
+        !checkToken(email, token)
+      )
+        return false;
       this.postsService.createPost(email, content);
     } catch (e) {
       console.error(e);
@@ -29,16 +42,21 @@ export class PostsController {
   }
 
   @Post("delete")
-  deletePost(@Query() query){
-    try{
-
+  deletePost(@Query() query) {
+    try {
       let email = query.email;
-      let postID = query.id;
+      let postID = query.postID;
+      let token = query.token;
 
-      if(!checkEmail(email) || !checkPostID(postID)) return false;
+      if (
+        !checkEmail(email) ||
+        !checkPostID(postID) ||
+        !checkToken(email, token)
+      )
+        return false;
 
       this.postsService.deletePost(email, postID);
-    }catch(e){
+    } catch (e) {
       console.error(e);
     }
   }
@@ -46,10 +64,18 @@ export class PostsController {
   @Post("addComment")
   addComment(@Query() query) {
     try {
-      let postID = query.id;
+      let postID = query.postID;
       let content = query.content;
+      let token = query.token;
+      let email = query.email;
 
-      if(!checkStringContent(content) || !checkPostID(postID)) return false;
+      if (
+        !checkStringContent(content) ||
+        !checkPostID(postID) ||
+        !checkEmail(email) ||
+        !checkToken(email, token)
+      )
+        return false;
 
       this.postsService.addComment(postID, content);
     } catch (e) {
@@ -59,28 +85,42 @@ export class PostsController {
 
   @Post("addLike")
   addLike(@Query() query) {
-    let postID = query.id;
-    if(!checkPostID(postID)) return false;
-    this.postsService.like(postID,true);
+    let postID = query.postID;
+    let token = query.token;
+    let email = query.email;
+
+    if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
+      return false;
+    this.postsService.like(postID, true);
   }
   @Post("removeLike")
   removeLike(@Query() query) {
-    let postID = query.id;
-    if(!checkPostID(postID)) return false;
-    this.postsService.like(postID,false);
+    let postID = query.postID;
+    let token = query.token;
+    let email = query.email;
 
+    if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
+      return false;
+    this.postsService.like(postID, false);
   }
   @Post("addDislike")
   addDislike(@Query() query) {
-    let postID = query.id;
-    if(!checkPostID(postID)) return false;
-    this.postsService.dislike(postID,true);
+    let postID = query.postID;
+    let token = query.token;
+    let email = query.email;
 
+    if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
+      return false;
+    this.postsService.dislike(postID, true);
   }
   @Post("removeDislike")
   removeDislike(@Query() query) {
-    let postID = query.id;
-    if(!checkPostID(postID)) return false;
-    this.postsService.dislike(postID,false);
+    let postID = query.postID;
+    let token = query.token;
+    let email = query.email;
+
+    if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
+      return false;
+    this.postsService.dislike(postID, false);
   }
 }

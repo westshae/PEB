@@ -11,21 +11,21 @@ export class PostsService {
 
   async createCustomID(){
     let code = (Math.floor(Math.random() * 90000000) + 10000000).toString(); // Generates 8 digit number
-    if(await(this.postsRepo.findOne({id:code})) !== null){
+    if(await(this.postsRepo.findOne({postID:code})) !== null){
       code = (Math.floor(Math.random() * 90000000) + 10000000).toString();
     }
     return code;
   }
 
   async getPost(postID: string) {
-    let data = await this.postsRepo.findOne({ id: postID });
+    let data = await this.postsRepo.findOne({ postID: postID });
     return data;
   }
 
   async createPost(email:string, content:string){
     let post = {
       ownerEmail: email,
-      id: await (this.createCustomID()),
+      postID: await (this.createCustomID()),
       content: content,
       likes: 0,
       dislikes: 0,
@@ -37,7 +37,7 @@ export class PostsService {
   async deletePost(email:string, postID:string){
     let post = await (this.getPost(postID));
     if(post.ownerEmail === email){
-      this.postsRepo.delete({id:postID});
+      this.postsRepo.delete({postID:postID});
     }else return;
   }
 
@@ -48,7 +48,7 @@ export class PostsService {
     }else{
       post.comments = [content];
     }
-    await this.postsRepo.update({id:postID}, {comments:post.comments});
+    await this.postsRepo.update({postID:postID}, {comments:post.comments});
   }
 
   async like(postID:string, add:boolean){
@@ -58,7 +58,7 @@ export class PostsService {
     }else{
       post.likes--;
     }
-    this.postsRepo.update({id:postID}, {likes:post.likes})
+    this.postsRepo.update({postID:postID}, {likes:post.likes})
   }
 
   async dislike(postID:string, add:boolean){
@@ -68,7 +68,7 @@ export class PostsService {
     }else{
       post.dislikes--;
     }
-    this.postsRepo.update({id:postID}, {likes:post.dislikes})
+    this.postsRepo.update({postID:postID}, {likes:post.dislikes})
   }
 
 

@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async getSettings(email: string, token: string) {
-    if (!checkToken(email, token)) return;
+    if (!checkEmail(email) || !checkToken(email, token)) return;
     let data = await this.authRepo.findOne({ email: email });
     let settings = {
       city: data.city,

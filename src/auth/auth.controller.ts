@@ -46,6 +46,7 @@ export class AuthController {
     let token = body.token;
 
     if(!checkEmail(email) || !checkToken(email, token)) return false;
+    console.log(checkToken(email, token));
 
     let settings = body.settings;
     this.authService.updateSettings(email, token, settings);
