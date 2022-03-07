@@ -45,8 +45,29 @@ export class PostsService {
       post.comments.push(content);
     }else{
       post.comments = [content];
-      
     }
     await this.postsRepo.update({id:postID}, {comments:post.comments});
   }
+
+  async like(postID:string, add:boolean){
+    let post = await (this.getPost(postID));
+    if(add){
+      post.likes++;
+    }else{
+      post.likes--;
+    }
+    this.postsRepo.update({id:postID}, {likes:post.likes})
+  }
+
+  async dislike(postID:string, add:boolean){
+    let post = await (this.getPost(postID));
+    if(add){
+      post.dislikes++;
+    }else{
+      post.dislikes--;
+    }
+    this.postsRepo.update({id:postID}, {likes:post.dislikes})
+  }
+
+
 }
