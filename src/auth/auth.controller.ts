@@ -44,7 +44,6 @@ export class AuthController {
 
     let settings = body.settings;
     this.authService.updateSettings(email, token, settings);
-
   }
 
   
