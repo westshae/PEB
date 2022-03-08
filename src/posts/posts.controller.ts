@@ -91,7 +91,7 @@ export class PostsController {
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
-    this.postsService.like(postID, true);
+    this.postsService.like(postID, true, email);
   }
   @Post("removeLike")
   removeLike(@Query() query) {
@@ -101,7 +101,7 @@ export class PostsController {
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
-    this.postsService.like(postID, false);
+    this.postsService.like(postID, false, email);
   }
   @Post("addDislike")
   addDislike(@Query() query) {
@@ -111,7 +111,7 @@ export class PostsController {
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
-    this.postsService.dislike(postID, true);
+    this.postsService.dislike(postID, true, email);
   }
   @Post("removeDislike")
   removeDislike(@Query() query) {
@@ -121,6 +121,6 @@ export class PostsController {
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
-    this.postsService.dislike(postID, false);
+    this.postsService.dislike(postID, false, email);
   }
 }
