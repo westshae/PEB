@@ -35,7 +35,7 @@ export class PostsController {
         !checkToken(email, token)
       )
         return false;
-      this.postsService.createPost(email, content);
+      this.postsService.createPost(email, content, null);
     } catch (e) {
       console.error(e);
     }
@@ -61,23 +61,23 @@ export class PostsController {
     }
   }
 
-  @Post("addComment")
-  addComment(@Query() query) {
+  @Post("addReply")
+  addReply(@Query() query) {
     try {
-      let postID = query.postID;
       let content = query.content;
       let token = query.token;
       let email = query.email;
+      let replyID = query.replyID;
 
       if (
         !checkStringContent(content) ||
-        !checkPostID(postID) ||
+        !checkPostID(replyID) ||
         !checkEmail(email) ||
         !checkToken(email, token)
       )
         return false;
 
-      this.postsService.addComment(postID, content);
+      this.postsService.createPost(email, content, replyID);
     } catch (e) {
       console.error(e);
     }
