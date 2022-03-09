@@ -23,16 +23,28 @@ export class PostsService {
   }
 
   async createPost(email: string, content: string, reply?:string) {
-    console.log(reply);
+    let postID = await this.createCustomID();
+    if(reply !== null){
+      let post = await (this.postsRepo.findOne({postID:reply}));
+      if(post === null){
+        return false;
+      }else{
+        post.replies++;
+        if(post.repliesID == null) post.repliesID = [];
+        post.repliesID.push(postID);
+        this.postsRepo.update({postID:reply}, {replies: post.replies, repliesID:post.repliesID});
+      }
+    }
+
     let post = {
       ownerEmail: email,
-      postID: await this.createCustomID(),
+      postID: postID,
       content: content,
       likes: 0,
       dislikes: 0,
+      replies: 0,
       replyID: reply
     };
-    console.log(post);
     this.postsRepo.save(post);
   }
 
@@ -42,19 +54,6 @@ export class PostsService {
       this.postsRepo.delete({ postID: postID });
     } else return false;
   }
-
-  // async addComment(postID: string, content: string) {
-  //   let post = await this.getPost(postID);
-  //   if (post.comments !== null) {
-  //     post.comments.push(content);
-  //   } else {
-  //     post.comments = [content];
-  //   }
-  //   await this.postsRepo.update(
-  //     { postID: postID },
-  //     { comments: post.comments },
-  //   );
-  // }
 
   async like(postID: string, add: boolean, email: string) {
     let post = await this.getPost(postID);

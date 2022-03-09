@@ -4,12 +4,18 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 export class PostsEntity {
   @PrimaryColumn()
   postID: string;
-  
+
   @Column()
   ownerEmail: string;
 
   @Column()
   content: string;
+
+  @Column({nullable:true})
+  replies: number;
+
+  @Column("text", {array:true, nullable:true})
+  repliesID: string[]
 
   @Column()
   likes: number;
