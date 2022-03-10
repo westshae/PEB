@@ -10,10 +10,7 @@ export class FeedService {
   private readonly postsRepo: Repository<PostsEntity>;
 
   async getFeed(postCount:number){
-    // let data = await this.postsRepo.createQueryBuilder().orderBy("time", "DESC").take(postCount).getMany();
     let data = await (await this.postsRepo.find({take:postCount})).reverse();
-
-    console.log(data);
     return data
   }
 }
