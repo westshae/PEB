@@ -15,9 +15,7 @@ export class PostsController {
     try {
       let postID = query.postID;
       if (!checkPostID(postID)) return false;
-      let test = await this.postsService.getPost(postID);
-      console.log(test);
-      return test
+      return await this.postsService.getPost(postID);
     } catch (e) {
       console.error(e);
     }

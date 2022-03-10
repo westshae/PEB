@@ -22,17 +22,20 @@ export class PostsService {
     return data;
   }
 
-  async createPost(email: string, content: string, reply?:string) {
+  async createPost(email: string, content: string, reply?: string) {
     let postID = await this.createCustomID();
-    if(reply !== null){
-      let post = await (this.postsRepo.findOne({postID:reply}));
-      if(post === null){
+    if (reply !== null) {
+      let post = await this.postsRepo.findOne({ postID: reply });
+      if (post === null) {
         return false;
-      }else{
+      } else {
         post.replies++;
-        if(post.repliesID == null) post.repliesID = [];
+        if (post.repliesID == null) post.repliesID = [];
         post.repliesID.push(postID);
-        this.postsRepo.update({postID:reply}, {replies: post.replies, repliesID:post.repliesID});
+        this.postsRepo.update(
+          { postID: reply },
+          { replies: post.replies, repliesID: post.repliesID },
+        );
       }
     }
 
@@ -43,7 +46,7 @@ export class PostsService {
       likes: 0,
       dislikes: 0,
       replies: 0,
-      replyID: reply
+      replyID: reply,
     };
     this.postsRepo.save(post);
   }

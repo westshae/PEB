@@ -11,11 +11,11 @@ export class PostsEntity {
   @Column()
   content: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   replies: number;
 
-  @Column("text", {array:true, nullable:true})
-  repliesID: string[]
+  @Column("text", { array: true, nullable: true })
+  repliesID: string[];
 
   @Column()
   likes: number;
