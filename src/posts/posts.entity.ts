@@ -31,4 +31,7 @@ export class PostsEntity {
 
   @Column({ nullable: true })
   replyID: string;
+
+  // @Column()
+  // creationDate: Date;
 }

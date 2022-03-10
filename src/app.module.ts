@@ -5,13 +5,15 @@ import { AppService } from "./app.service";
 import { DatabaseConnectionService } from "./database-connection.service";
 import { AuthModule } from "./auth/auth.module";
 import { PostsModule } from "./posts/posts.module";
+import { FeedModule } from "./feed/feed.module";
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConnectionService,
     }),
     AuthModule,
-    PostsModule
+    PostsModule,
+    FeedModule
   ],
   controllers: [AppController],
   providers: [AppService],
