@@ -22,7 +22,7 @@ export class PostsService {
     return data;
   }
 
-  async createPost(email: string, content: string, reply?: string) {
+  async createPost(email: string, content: string,time:number, reply?: string ) {
     let postID = await this.createCustomID();
     if (reply !== null) {
       let post = await this.postsRepo.findOne({ postID: reply });
@@ -47,6 +47,7 @@ export class PostsService {
       dislikes: 0,
       replies: 0,
       replyID: reply,
+      time: time,
     };
     this.postsRepo.save(post);
   }

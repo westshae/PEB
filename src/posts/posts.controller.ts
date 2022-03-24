@@ -22,29 +22,30 @@ export class PostsController {
   }
 
   @Post("create")
-  createPost(@Query() query) {
+  createPost(@Body() body) {
     try {
-      let content = query.content;
-      let email = query.email;
-      let token = query.token;
+      let content = body.content;
+      let email = body.email;
+      let token = body.token;
+      let time = new Date().getMinutes();
       if (
         !checkEmail(email) ||
         !checkStringContent(content) ||
         !checkToken(email, token)
       )
         return false;
-      this.postsService.createPost(email, content, null);
+      this.postsService.createPost(email, content, time, null);
     } catch (e) {
       console.error(e);
     }
   }
 
   @Post("delete")
-  deletePost(@Query() query) {
+  deletePost(@Body() body) {
     try {
-      let email = query.email;
-      let postID = query.postID;
-      let token = query.token;
+      let email = body.email;
+      let postID = body.postID;
+      let token = body.token;
 
       if (
         !checkEmail(email) ||
@@ -60,12 +61,12 @@ export class PostsController {
   }
 
   @Post("addReply")
-  addReply(@Query() query) {
+  addReply(@Body() body) {
     try {
-      let content = query.content;
-      let token = query.token;
-      let email = query.email;
-      let replyID = query.replyID;
+      let content = body.content;
+      let token = body.token;
+      let email = body.email;
+      let replyID = body.replyID;
 
       if (
         !checkStringContent(content) ||
@@ -82,40 +83,40 @@ export class PostsController {
   }
 
   @Post("addLike")
-  addLike(@Query() query) {
-    let postID = query.postID;
-    let token = query.token;
-    let email = query.email;
+  addLike(@Body() body) {
+    let postID = body.postID;
+    let token = body.token;
+    let email = body.email;
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
     this.postsService.like(postID, true, email);
   }
   @Post("removeLike")
-  removeLike(@Query() query) {
-    let postID = query.postID;
-    let token = query.token;
-    let email = query.email;
+  removeLike(@Body() body) {
+    let postID = body.postID;
+    let token = body.token;
+    let email = body.email;
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
     this.postsService.like(postID, false, email);
   }
   @Post("addDislike")
-  addDislike(@Query() query) {
-    let postID = query.postID;
-    let token = query.token;
-    let email = query.email;
+  addDislike(@Body() body) {
+    let postID = body.postID;
+    let token = body.token;
+    let email = body.email;
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;
     this.postsService.dislike(postID, true, email);
   }
   @Post("removeDislike")
-  removeDislike(@Query() query) {
-    let postID = query.postID;
-    let token = query.token;
-    let email = query.email;
+  removeDislike(@Body() body) {
+    let postID = body.postID;
+    let token = body.token;
+    let email = body.email;
 
     if (!checkPostID(postID) || !checkEmail(email) || !checkToken(email, token))
       return false;

@@ -14,6 +14,9 @@ export class PostsEntity {
   @Column({ nullable: true })
   replies: number;
 
+  @Column()
+  time: number;
+
   @Column("text", { array: true, nullable: true })
   repliesID: string[];
 
